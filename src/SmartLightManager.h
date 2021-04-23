@@ -23,6 +23,7 @@ public:
     virtual ~SmartLightManager(void);
 
     void mapPin(int lightId, int pin);
+    void mapPin(JsonArray arrLightPins);
     void mapPin(const char *arrLightPins);
     void mapPin(String arrLightPins);
     void removePin(int lightId);
@@ -32,8 +33,10 @@ public:
     bool turnOn(int lightId);
     bool turnOff(int lightId);
     bool controlLight(int lightId, bool status);
+    bool controlLight(JsonArray ctrlArray);
     bool controlLight(const char *ctrlString);
     bool controlLight(String ctrlString);
+    bool mixControl(JsonArray ctrlArray);
     bool mixControl(const char *ctrlString);
     bool mixControl(String ctrlString);
 };

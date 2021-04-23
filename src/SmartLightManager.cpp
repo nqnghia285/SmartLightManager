@@ -21,6 +21,19 @@ void SmartLightManager::mapPin(int lightId, int pin)
 }
 
 /**
+ * @brief Match lightId (key) with pin (value)
+ * 
+ * @param arrLightPins JsonArray
+ */
+void SmartLightManager::mapPin(JsonArray arrLightPins)
+{
+    for (JsonArray::iterator it = arrLightPins.begin(); it != arrLightPins.end(); ++it)
+    {
+        mapPin(it->getElement(0), it->getElement(1));
+    }
+}
+
+/**
  * @brief Match lightId (key) with pin (value), param is a string follow format: "[[lightId,pin],[lightId,pin],...]"
  * 
  * @param arrLightPins const char *
@@ -34,12 +47,7 @@ void SmartLightManager::mapPin(const char *arrLightPins)
     {
         // Get a reference to the root array
         JsonArray arr = params.as<JsonArray>();
-        for (JsonArray::iterator it = arr.begin(); it != arr.end(); ++it)
-        {
-            mapPin(it->getElement(0), it->getElement(1));
-            // Serial.println("LightId: " + String(_lightPins.at(it->getElement(0))));
-            // Serial.println("Pin: " + String(_lightPins.at(it->getElement(0))));
-        }
+        mapPin(arr);
     }
     else
     {
@@ -175,6 +183,17 @@ bool SmartLightManager::controlLight(int lightId, bool status)
 }
 
 /**
+ * @brief Control a light, param is a JsonArray follow format: "[lightId,status]"
+ * 
+ * @param ctrlString JsonArray
+ * @return bool
+ */
+bool SmartLightManager::controlLight(JsonArray ctrlArray)
+{
+    return controlLight(ctrlArray.getElement(0), ctrlArray.getElement(1));
+}
+
+/**
  * @brief Control a light, param is a string follow format: "[lightId,status]"
  * 
  * @param ctrlString const char *
@@ -190,7 +209,7 @@ bool SmartLightManager::controlLight(const char *ctrlString)
     {
         // Get a reference to the root array
         JsonArray arr = params.as<JsonArray>();
-        isSuccess = controlLight(arr.getElement(0), arr.getElement(1));
+        isSuccess = controlLight(arr);
     }
     else
     {
@@ -203,9 +222,25 @@ bool SmartLightManager::controlLight(const char *ctrlString)
     return isSuccess;
 }
 
+/**
+ * @brief Control a light, param is a string follow format: "[lightId,status]"
+ * 
+ * @param ctrlString String
+ * @return bool
+ */
 bool SmartLightManager::controlLight(String ctrlString)
 {
     return controlLight(ctrlString.c_str());
+}
+
+bool SmartLightManager::mixControl(JsonArray ctrlArray)
+{
+    bool isSuccess = true;
+    for (JsonArray::iterator it = ctrlArray.begin(); it != ctrlArray.end(); ++it)
+    {
+        isSuccess = controlLight(it->getElement(0), it->getElement(1)) ? isSuccess : false;
+    }
+    return isSuccess;
 }
 
 /**
@@ -224,10 +259,7 @@ bool SmartLightManager::mixControl(const char *ctrlString)
     {
         // Get a reference to the root array
         JsonArray arr = params.as<JsonArray>();
-        for (JsonArray::iterator it = arr.begin(); it != arr.end(); ++it)
-        {
-            isSuccess = controlLight(it->getElement(0), it->getElement(1)) ? isSuccess : false;
-        }
+        isSuccess = mixControl(arr);
     }
     else
     {
