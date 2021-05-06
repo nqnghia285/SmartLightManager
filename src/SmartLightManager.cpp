@@ -233,33 +233,39 @@ bool SmartLightManager::controlLight(String ctrlString)
     return controlLight(ctrlString.c_str());
 }
 
-bool SmartLightManager::mixControl(JsonArray ctrlArray)
+/**
+ * @brief Control multiple lights at the same time, param is a string follow format: "[lightId,lightId,...]"
+ * 
+ * @param ctrlString JsonArray
+ * @return bool
+ */
+bool SmartLightManager::mixControl(JsonArray lightIds, bool status)
 {
     bool isSuccess = true;
-    for (JsonArray::iterator it = ctrlArray.begin(); it != ctrlArray.end(); ++it)
+    for (unsigned int i = 0; i < lightIds.size(); i++)
     {
-        isSuccess = controlLight(it->getElement(0), it->getElement(1)) ? isSuccess : false;
+        isSuccess = controlLight(lightIds.getElement(i), status) ? isSuccess : false;
     }
     return isSuccess;
 }
 
 /**
- * @brief Control multiple lights at the same time, param is a string follow format: "[[lightId,status],[lightId,status],...]"
+ * @brief Control multiple lights at the same time, param is a string follow format: "[lightId,lightId,...]"
  * 
  * @param ctrlString const char *
  * @return bool
  */
-bool SmartLightManager::mixControl(const char *ctrlString)
+bool SmartLightManager::mixControl(const char *lightIds, bool status)
 {
     DynamicJsonDocument params(512);
-    DeserializationError err = deserializeJson(params, ctrlString);
+    DeserializationError err = deserializeJson(params, lightIds);
     bool isSuccess = true;
 
     if (err == DeserializationError::Ok)
     {
         // Get a reference to the root array
         JsonArray arr = params.as<JsonArray>();
-        isSuccess = mixControl(arr);
+        isSuccess = mixControl(arr, status);
     }
     else
     {
@@ -274,12 +280,12 @@ bool SmartLightManager::mixControl(const char *ctrlString)
 }
 
 /**
- * @brief Control multiple lights at the same time, param is a string follow format: "[[lightId,status],[lightId,status],...]"
+ * @brief Control multiple lights at the same time, param is a string follow format: "[lightId,lightId,...]"
  * 
  * @param ctrlString String
  * @return bool
  */
-bool SmartLightManager::mixControl(String ctrlString)
+bool SmartLightManager::mixControl(String ctrlString, bool status)
 {
-    return mixControl(ctrlString.c_str());
+    return mixControl(ctrlString.c_str(), status);
 }

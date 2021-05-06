@@ -36,9 +36,9 @@ public:
     bool controlLight(JsonArray ctrlArray);
     bool controlLight(const char *ctrlString);
     bool controlLight(String ctrlString);
-    bool mixControl(JsonArray ctrlArray);
-    bool mixControl(const char *ctrlString);
-    bool mixControl(String ctrlString);
+    bool mixControl(JsonArray lightIds, bool status);
+    bool mixControl(const char *lightIds, bool status);
+    bool mixControl(String lightIds, bool status);
 };
 
 #endif /* SMARTLIGHTMANAGER_H_ */
